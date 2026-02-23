@@ -1,0 +1,189 @@
+﻿@model PortfolioViewModel
+
+@{
+    ViewData["Title"] = "Herman's Portfolio";
+}
+
+<section id="hero" class="py-5 bg-white border-bottom">
+    <div class="container">
+        <div class="row align-items-center min-vh-100 py-5">
+            <div class="col-lg-8 col-md-7 order-2 order-md-1">
+                <h1 class="display-4 fw-bold mb-3">@(Model.Profile?.FullName ?? "Herman")</h1>
+                <h2 class="h3 text-secondary mb-4">@(Model.Profile?.ProfessionalTitle ?? "Developer")</h2>
+                <p class="lead mb-4">@(Model.Profile?.AboutMe ?? "Professional summary")</p>
+                @if (!string.IsNullOrEmpty(Model.Profile?.ResumeFilePath))
+                {
+                    <a asp-action="DownloadResume" class="btn btn-dark btn-lg px-4">Download CV</a>
+                }
+            </div>
+            <div class="col-lg-4 col-md-5 order-1 order-md-2 text-center mb-4 mb-md-0">
+                @if (!string.IsNullOrEmpty(Model.Profile?.ProfilePhotoPath))
+                {
+                    <img src="@Model.Profile.ProfilePhotoPath" alt="@Model.Profile.FullName" class="profile-photo img-fluid rounded-circle border border-2 border-secondary">
+                }
+                else
+                {
+                    <div class="profile-photo-placeholder mx-auto rounded-circle bg-secondary d-flex align-items-center justify-content-center">
+                        <span class="display-1 text-white">@(Model.Profile?.FullName?.Substring(0, 1) ?? "H")</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">About</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <p class="lead">
+                    @if (!string.IsNullOrEmpty(Model.Profile?.AboutMe))
+                    {
+                        @Model.Profile.AboutMe
+                    }
+                    else
+                    {
+                        @:Software developer passionate about building web applications.
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="skills" class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Skills</h2>
+        @if (Model.Skills != null && Model.Skills.Any())
+        {
+            <div class="row g-4">
+                @foreach (var category in Model.Skills.GroupBy(s => s.Category))
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <div class="p-3 bg-light rounded">
+                            <h3 class="h6 mb-3 fw-bold">@category.Key</h3>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var skill in category)
+                                {
+                                    <span class="badge bg-dark text-white px-3 py-2">@skill.Name</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<section id="projects" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Projects</h2>
+        @if (Model.Projects != null && Model.Projects.Any())
+        {
+            <div class="row g-4">
+                @foreach (var project in Model.Projects)
+                {
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            @if (!string.IsNullOrEmpty(project.ScreenshotPath))
+                            {
+                                <img src="@project.ScreenshotPath" class="card-img-top" alt="@project.Name" style="height: 200px; object-fit: cover;">
+                            }
+                            <div class="card-body">
+                                <h3 class="h5 card-title fw-bold">@project.Name</h3>
+                                <p class="card-text text-secondary">@project.Description</p>
+                                @if (!string.IsNullOrEmpty(project.Technologies))
+                                {
+                                    <div class="mb-3">
+                                        @foreach (var tech in project.Technologies.Split(','))
+                                        {
+                                            <span class="badge bg-light text-dark border me-1 mb-1">@tech.Trim()</span>
+                                        }
+                                    </div>
+                                }
+                                <div>
+                                    @if (!string.IsNullOrEmpty(project.GitHubUrl))
+                                    {
+                                        <a href="@project.GitHubUrl" target="_blank" class="btn btn-outline-dark btn-sm me-2">GitHub</a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(project.LiveDemoUrl))
+                                    {
+                                        <a href="@project.LiveDemoUrl" target="_blank" class="btn btn-dark btn-sm">Live Demo</a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<section id="education" class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Education</h2>
+        @if (Model.Educations != null && Model.Educations.Any())
+        {
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    @foreach (var edu in Model.Educations)
+                    {
+                        <div class="card mb-4 border-0 bg-light">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="fw-bold">
+                                            @edu.StartDate.Year - @(edu.EndDate?.Year.ToString() ?? edu.ExpectedGraduation ?? "Present")
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <h3 class="h6 fw-bold mb-1">@edu.Degree</h3>
+                                        <p class="text-secondary mb-2">@edu.Institution</p>
+                                        @if (!string.IsNullOrEmpty(edu.Achievements))
+                                        {
+                                            <p class="small mb-0">@edu.Achievements</p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<section id="contact" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Contact</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                @if (Model.ContactInfo != null)
+                {
+                    <div class="p-4 bg-white rounded shadow-sm">
+                        @if (!string.IsNullOrEmpty(Model.ContactInfo.Email))
+                        {
+                            <div class="mb-3">
+                                <a href="mailto:@Model.ContactInfo.Email" class="text-dark text-decoration-none">@Model.ContactInfo.Email</a>
+                            </div>
+                        }
+                        <div class="mt-3">
+                            @if (!string.IsNullOrEmpty(Model.ContactInfo.LinkedInUrl))
+                            {
+                                <a href="@Model.ContactInfo.LinkedInUrl" target="_blank" class="btn btn-outline-dark me-2">LinkedIn</a>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ContactInfo.GitHubUrl))
+                            {
+                                <a href="@Model.ContactInfo.GitHubUrl" target="_blank" class="btn btn-dark">GitHub</a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
